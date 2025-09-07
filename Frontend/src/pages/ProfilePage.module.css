@@ -1,0 +1,66 @@
+.pageWrapper {
+    background-color: #f8fafc;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.header {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1e293b; /* CORRECTED THIS LINE */
+    margin-bottom: 2rem;
+}
+
+.error {
+    color: #b91c1c;
+}
+
+.profileCard {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+}
+
+.profileInfo {
+    margin-bottom: 1.5rem;
+}
+
+.profileInfo label {
+    display: block;
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+}
+
+.profileInfo p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #334155;
+    padding: 0.75rem;
+    background-color: #f1f5f9;
+    border-radius: 8px;
+}
+
+.editButton {
+    background-color: #4F46E5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+}
+
+.editButton:hover {
+    background-color: #4338ca;
+}

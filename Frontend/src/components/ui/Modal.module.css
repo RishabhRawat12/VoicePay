@@ -1,0 +1,73 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.title {
+    margin-top: 0;
+    color: #1e293b;
+}
+
+.content {
+    margin: 2rem 0;
+    color: #475569;
+    font-size: 1.1rem;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.confirmButton, .cancelButton {
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.cancelButton {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.cancelButton:hover {
+    background-color: #e2e8f0;
+}
+
+.confirmButton {
+    background-color: #22c55e;
+    color: white;
+}
+
+.confirmButton:hover {
+    background-color: #16a34a;
+}
+.listeningIndicator {
+    margin-top: 1rem;
+    color: #4F46E5;
+    font-weight: 500;
+}

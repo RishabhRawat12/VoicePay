@@ -1,0 +1,136 @@
+.container {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  font-family: Arial, sans-serif;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.card p {
+  margin: 2px 0;
+}
+
+.card .phrase {
+  font-weight: 500;
+}
+
+.card .description {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Tag */
+.tag {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+/* Checkmark */
+.checkmark {
+  color: #22c55e;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.form-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.form-card input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+
+.form-card input:focus {
+  border-color: #2563eb;
+}
+
+.add-btn {
+  width: 100%;
+  background: #2563eb;
+  color: #fff;
+  padding: 10px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background: #1e40af;
+}
+
+/* Custom commands */
+.status {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+/* Buttons */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pause-btn,
+.delete-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pause-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.pause-btn:hover {
+  background: #e5e7eb;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background: #b91c1c;
+}
