@@ -11,7 +11,7 @@ import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
-import VoiceCommand from './pages/voiceCommandsPage';
+import VoiceCommandPage from './pages/voiceCommandsPage';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

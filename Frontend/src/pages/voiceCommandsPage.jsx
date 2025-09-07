@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./VoiceCommand.css"; // Import the CSS file
 
 const VoiceCommandPage = () => {
   const defaultCommands = [
