@@ -1,0 +1,95 @@
+command,intent
+send 500 rupees to arjun,transfer_money
+transfer 1000 to rahul,transfer_money
+please transfer 250 to ramesh,transfer_money
+give 400 rupees to simran,transfer_money
+pay 200 to shreya,transfer_money
+transfer 750 to amit,transfer_money
+send 1200 to neha,transfer_money
+move 300 rupees to ritu,transfer_money
+transfer 600 to manish,transfer_money
+please send 800 to kavita,transfer_money
+pay 1500 to sunil,transfer_money
+transfer 2000 to preeti,transfer_money
+send 350 to ravi,transfer_money
+transfer 900 to pooja,transfer_money
+give 700 rupees to arjun,transfer_money
+please send 450 to priyanka,transfer_money
+transfer 1100 to aditya,transfer_money
+send 2500 to sneha,transfer_money
+pay 600 to saurabh,transfer_money
+transfer 100 to riya,transfer_money
+what is my account balance,check_balance
+show balance,check_balance
+check my bank balance,check_balance
+how much money do i have,check_balance
+tell me my account status,check_balance
+balance inquiry,check_balance
+current account balance,check_balance
+check balance for me,check_balance
+show my balance,check_balance
+account summary,check_balance
+how much is left in my account,check_balance
+tell me my remaining balance,check_balance
+balance status,check_balance
+can you show my balance,check_balance
+how much funds do i have,check_balance
+pay my electricity bill,bill_payment
+pay the water bill,bill_payment
+settle my internet bill,bill_payment
+pay gas bill,bill_payment
+pay my dth bill,bill_payment
+electricity bill payment,bill_payment
+water bill payment,bill_payment
+internet bill payment,bill_payment
+pay mobile bill,bill_payment
+settle electricity dues,bill_payment
+pay outstanding gas bill,bill_payment
+settle my phone bill,bill_payment
+pay broadband bill,bill_payment
+bill payment for electricity,bill_payment
+pay my bills,bill_payment
+recharge my phone for 200,recharge
+mobile recharge 300,recharge
+top up phone with 100,recharge
+add 500 talktime to my number,recharge
+recharge jio number for 400,recharge
+top up my airtel with 250,recharge
+recharge idea number 300,recharge
+mobile top-up 200,recharge
+recharge my phone with 150,recharge
+recharge number 500,recharge
+add balance 100 to my mobile,recharge
+phone recharge 350,recharge
+top up 400 for my number,recharge
+recharge sim with 600,recharge
+send 250 rupees to arjun,transfer_money
+transfer 3000 to rohit,transfer_money
+please pay 1000 to suresh,transfer_money
+send 450 to tanvi,transfer_money
+transfer 550 to rakesh,transfer_money
+move 700 to anjali,transfer_money
+pay 850 to vikas,transfer_money
+transfer 1200 to sonia,transfer_money
+send 150 to amit,transfer_money
+give 400 rupees to neha,transfer_money
+what is my current balance,check_balance
+show my account balance,check_balance
+check bank account,check_balance
+how much money left,check_balance
+tell me remaining balance,check_balance
+balance check,check_balance
+balance enquiry,check_balance
+check funds,check_balance
+show me my funds,check_balance
+account balance details,check_balance
+pay electricity bill 300,bill_payment
+pay water bill 200,bill_payment
+settle internet charges 400,bill_payment
+pay dth bill 500,bill_payment
+pay gas charges 250,bill_payment
+recharge my phone 100,recharge
+top-up my number 150,recharge
+add talktime 200,recharge
+mobile recharge 300,recharge
+recharge sim 400,recharge

@@ -1,134 +1,163 @@
-import speech_recognition as sr
-import pyttsx3 as speak
-import re
-import requests
+from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
+from sqlalchemy import or_
+from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+import os
+import pickle
+from ml_models.fraud_detection_model import FraudDetector
 
-speech_engine=speak.init()
+# -------------------- App Setup --------------------
+app = Flask(__name__)
+CORS(app, supports_credentials=True)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-def speaker(text):
-    speech_engine.say(text)
-    speech_engine.runAndWait()
+# -------------------- Database Models --------------------
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+    balance = db.Column(db.Float, nullable=False, default=1000.0)
 
-def greet():
-    speaker("Hello")
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
 
-def input_voice():
-    recognizer = sr.Recognizer()
-    try:
-        YOUR_DEVICE_INDEX = 1
-        with sr.Microphone(device_index=YOUR_DEVICE_INDEX) as mic:
-            recognizer.adjust_for_ambient_noise(mic, duration=1)
-            print("Listening...")
-            audio = recognizer.listen(mic, timeout=5, phrase_time_limit=5)
-            input_audio = recognizer.recognize_google(audio)
-            print(f"You said: {input_audio}") 
-            speaker(input_audio)
-            return input_audio.lower()
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
-    except sr.WaitTimeoutError:
-        speaker("I didn't hear anything. Please try again.")
-        return ""
-    except sr.UnknownValueError:
-        speaker("Sorry, I did not understand what you said.")
-        return ""
-    except sr.RequestError:
-        speaker("There seems to be an issue with my connection.")
-        return ""
-    except IndexError:
-        speaker("The selected microphone index is not valid.")
-        return ""
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Float, nullable=False)
+    recipient = db.Column(db.String(80), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-def parse_amount(amount_text):
-    amount_text=amount_text.lower().strip()
-    words=amount_text.split()
+# -------------------- Fraud Detection Helper --------------------
+def get_fraud_model():
+    transactions = Transaction.query.all()
+    amounts = [t.amount for t in transactions]
+    model = FraudDetector()
+    if amounts:
+        model.fit(amounts)
+    return model
 
-    multipliers={'thousand':1000 , 'lakh':100000 , 'crore':10000000}
-    numerical_amount=0
+# -------------------- User Routes --------------------
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    if User.query.filter_by(username=data['username']).first():
+        return jsonify({'message':'User already exists'}), 409
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({'message':'Email already exists'}), 409
+    new_user = User(username=data['username'], email=data['email'])
+    new_user.set_password(data['password'])
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({'message':'User created successfully'}), 201
 
-    for word in words:
-        try:
-            numerical_amount=float(word)
-            break
-        except ValueError:
-            continue
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = User.query.filter_by(username=data['username']).first()
+    if user is None or not user.check_password(data['password']):
+        return jsonify({'message':'User does not exist or wrong password'}), 401
+    return jsonify({'message':'Login successful', 'user_id': user.id}), 200
 
-    if numerical_amount==0: return None
+@app.route('/user/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        return jsonify({'username': user.username, 'balance': user.balance})
+    return jsonify({'message':'User not found'}), 404
 
-    for word in words:
-        if word in multipliers:
-            numerical_amount*=multipliers[word]
-            break
+@app.route('/transactions/<int:user_id>', methods=['GET'])
+def get_transactions(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'message':'User not found'}), 404
 
-    return int(numerical_amount)
+    all_transactions = Transaction.query.filter(
+        or_(Transaction.user_id == user_id, Transaction.recipient == user.username)
+    ).order_by(Transaction.timestamp.desc()).all()
 
-
-def parse_payment(user_input):
-    try:
-        amount_pattern=r'([\d\.]+\s*(?:lakh|crore|thousand)?)'
-        extracted_amount=re.search(amount_pattern,user_input,re.IGNORECASE)
-
-        recipient_pattern = r'(?:to|for)\s+([a-zA-Z\s]+)'
-        expected_recipient=re.search(recipient_pattern,user_input,re.IGNORECASE)
-        if extracted_amount and expected_recipient:
-            amount_text=extracted_amount.group(0)
-            amount=parse_amount(amount_text)
-
-            recipient=expected_recipient.group(1).title()
-
-            return {"amount":amount,"recipient":recipient}
+    result = []
+    for t in all_transactions:
+        if t.user_id == user_id:
+            result.append({
+                'type': 'sent',
+                'party': t.recipient,
+                'amount': t.amount,
+                'timestamp': t.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            })
         else:
-            return None
+            sender = User.query.get(t.user_id)
+            result.append({
+                'type': 'received',
+                'party': sender.username if sender else 'Unknown User',
+                'amount': t.amount,
+                'timestamp': t.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            })
+    return jsonify(result)
 
-    except Exception as e:
-        print(f"Error occured while parsing input")
-        return None
-    
-def process_payment(payment_details):
-    try:
-        amount=payment_details["amount"]
-        recipient=payment_details["recipient"]
-        confirmation=f"just to confirm, should i pay {amount} rupees to {recipient}? "
-        speaker(confirmation)
+# -------------------- Parse Voice Command --------------------
+@app.route('/parse-voice-command', methods=['POST'])
+def parse_voice_command():
+    data = request.get_json()
+    text = data.get('voice_input')
+    if not text:
+        return jsonify({'message': 'No voice input provided.'}), 400
 
-        print("Waiting for your confirmation (yes/no)")
-        confirmed=input_voice().lower().strip()
+    intent = classify_intent(text)
+    if intent != "transfer_money":
+        return jsonify({'message': f'Intent detected: {intent}. Parsing not required.'}), 200
 
-        if "yes" in confirmed:
-            url="http://127.0.0.1:5000/transaction"
-            data={"recipient":recipient,"amount":amount}
-            response=requests.post(url,json=data)
+    payment_details = parse_payment(text)
+    if not payment_details:
+        return jsonify({'message': 'Could not extract payment details from command.'}), 400
 
-            if response.status_code==201:
-                paid=f"Paid {amount} rupees to {recipient} successfully"
-                print(paid)
-                speaker(paid)
+    recipient = User.query.filter_by(username=payment_details['recipient']).first()
+    if not recipient:
+        return jsonify({'message': f"Recipient '{payment_details['recipient']}' not found."}), 404
 
-            else:
-                error_msg=f"payment failed: {response.json().get('message','Unknown error')}"
-                print(error_msg)
-                speaker(error_msg)
+    return jsonify(payment_details), 200
 
-        print("Payment Cancelled")
-        speaker("Payment Cancelled")
+# -------------------- Transaction Routes --------------------
+@app.route('/transaction', methods=['POST'])
+def create_transaction():
+    data = request.get_json()
+    sender_id = data['sender_id']
+    recipient_username = data['recipient_username']
+    amount = float(data['amount'])
 
-        
+    sender = User.query.get(sender_id)
+    recipient = User.query.filter_by(username=recipient_username).first()
 
-    except Exception as e:
-        print(f"An error occured during payment : {e}")
-        return None
+    if recipient is None:
+        return jsonify({'message': 'Recipient does not exist.'}), 404
+    if sender.id == recipient.id:
+        return jsonify({'message': 'You cannot send money to yourself.'}), 400
+    if sender.balance < amount:
+        return jsonify({'message': 'Insufficient funds.'}), 400
 
+    # Fraud detection
+    fraud_model = get_fraud_model()
+    if fraud_model.predict(amount):
+        return jsonify({'message': 'Transaction flagged as suspicious!'}), 403
 
-'''main function'''
-if __name__ == "__main__":
-    greet()
-    user_input=input_voice()   
+    sender.balance -= amount
+    recipient.balance += amount
+    new_transaction = Transaction(amount=amount, recipient=recipient_username, user_id=sender_id)
+    db.session.add(new_transaction)
+    db.session.commit()
+    return jsonify({'message':'Transaction successful!', 'new_balance': sender.balance}), 200
 
-    if user_input:
-        payment_details = parse_payment(user_input)
-    
-        if payment_details:
-            print(f"Payment details : {payment_details}")
-            process_payment(payment_details)
-        else:
-            print('Sorry I could not extract details from your request')
-            speaker('Sorry I could not extract amount and recipient name from your request')
+# -------------------- Run App --------------------
+if __name__ == '__main__':
+    print("Database path:", os.path.abspath("database.db"))
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
